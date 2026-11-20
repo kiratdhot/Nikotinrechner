@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="dark" />
+  <title>Nikotinrechner – iPhone</title>
+  <meta name="theme-color" content="#0b1220" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Nikotinrechner" />
+  <meta name="description" content="Kostenloser Nikotin- und Aromarechner für iPhone: Aroma in ml oder Prozent, Nikotin und Base berechnen." />
+  <style>
+    :root{font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#eaf0fb;background:#0b1220;font-synthesis:none}
+    *{box-sizing:border-box}
+    body{margin:0;min-height:100vh;background:radial-gradient(ellipse at 85% 0,rgba(70,100,200,.22),transparent 43%),#0b1220}
+    .wrap{max-width:870px;margin:auto;padding:40px 20px 68px}
+    .eyebrow{display:inline-block;color:#93c5fd;background:#172745;border:1px solid #2c4673;padding:5px 12px;border-radius:99px;font-weight:700;font-size:12px;letter-spacing:.05em;text-transform:uppercase}
+    h1{font-size:clamp(30px,5vw,46px);line-height:1.13;margin:18px 0 10px;letter-spacing:-.04em}
+    .intro{color:#aebed4;margin:0 0 30px;line-height:1.6}
+    .panel{background:#131e31;border:1px solid #293b56;border-radius:20px;padding:24px;box-shadow:0 16px 40px #0002}
+    .tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:25px;padding:5px;background:#091427;border-radius:13px}
+    .tab{color:#abb9d0;border:0;background:transparent;font:inherit;font-weight:700;border-radius:9px;min-height:45px;padding:10px;cursor:pointer}
+    .tab[aria-selected="true"]{color:#fff;background:#315fe1;box-shadow:0 5px 14px #0003}
+    h2{font-size:20px;letter-spacing:-.02em;margin:0 0 6px}
+    .sub{color:#aebed4;line-height:1.5;font-size:14px;margin:0 0 24px}
+    .inputs{display:grid;grid-template-columns:1fr 1fr;gap:17px}
+    label{display:block;color:#cbd7e8;font-size:14px;font-weight:650;margin-bottom:7px}
+    button,select{touch-action:manipulation}
+    .inputbox{display:flex;background:#0d1728;border:1px solid #3c4e69;border-radius:12px;overflow:hidden;transition:border-color .15s}
+    .inputbox:focus-within{border-color:#76a9fb;box-shadow:0 0 0 3px #315fe144}
+    input{font-size:16px;background:transparent;border:0;outline:0;color:white;width:100%;padding:13px 12px;font:inherit;font-size:18px;min-width:0}
+    input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+    input[type=number]{-moz-appearance:textfield;appearance:textfield}
+    .unit{color:#9baec9;padding:14px 14px 14px 0;white-space:nowrap}
+    .unit-select{background:#1e304d;border:0;border-left:1px solid #3c4e69;color:#fff;font:inherit;font-size:15px;font-weight:700;padding:0 12px;cursor:pointer;outline:0;min-width:64px}
+    .unit-select:focus-visible{outline:2px solid #93c5fd;outline-offset:-3px}
+    .unit-select option{background:#1e304d;color:#fff}
+    .results{margin-top:28px;border-top:1px solid #31425d;padding-top:22px}
+    .resultgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+    .result{background:#0c182b;border:1px solid #293b56;border-radius:13px;padding:17px 14px}
+    .result.primary{border-color:#386add;background:#142954}
+    .result .name{color:#aec0d8;font-size:12px;line-height:1.4;font-weight:600}
+    .result .value{font-weight:780;font-size:clamp(24px,3vw,32px);letter-spacing:-.04em;margin:8px 0 2px;overflow-wrap:anywhere}
+    .result .suffix{font-size:13px;color:#a8bbd4;font-weight:550}
+    .hint{margin-top:16px;background:#14233c;border:1px solid #304a75;color:#d5e1f5;border-radius:10px;padding:13px 15px;font-size:14px;line-height:1.5}
+    .error{background:#432629;border-color:#8e555b;color:#ffd9dd}
+    .hidden{display:none!important}
+    .calcbtn{display:block;width:100%;margin-top:20px;background:#426feb;border:1px solid #6c93fa;color:white;padding:14px 18px;border-radius:11px;font:inherit;font-weight:750;font-size:16px;cursor:pointer}
+    .calcbtn:focus-visible{outline:3px solid #fff;outline-offset:2px}
+    .calcbtn:active{background:#335ac9}
+    .warning{background:#493426;border:1px solid #bd8347;color:#ffe7bb;border-radius:12px;padding:14px 17px;margin-bottom:16px;line-height:1.5}
+    footer{color:#a4b1c7;font-size:13px;line-height:1.55;margin-top:24px}
+    @media(max-width:590px){.wrap{padding:25px 14px 40px}.panel{padding:16px}.inputs{grid-template-columns:1fr;gap:13px}.resultgrid{grid-template-columns:1fr 1fr}.result:last-child{grid-column:span 2}.result .value{font-size:27px}.tabs{gap:4px}.tab{font-size:13px}}
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <span class="eyebrow">Einfacher E-Liquid Rechner</span>
+    <h1>Nikotinrechner</h1>
+    <p class="intro">Plane deine Mischung oder ermittle die Nikotinstärke einer vorhandenen Mischung. Die Ergebnisse werden sofort aktualisiert.</p>
+    <div id="js-warning" class="warning" role="alert">Die Dateivorschau führt den Rechner möglicherweise nicht aus. Öffne die veröffentlichte Webseite in Safari. Eine heruntergeladene Datei in der Dateien-App reicht nicht immer aus.</div>
+    <noscript><div class="warning">JavaScript ist deaktiviert. Aktiviere JavaScript in deinem Browser, damit die Berechnung funktioniert.</div></noscript>
+    <section class="panel">
+      <div class="tabs" role="tablist" aria-label="Rechenmodus">
+        <button id="tab-plan" class="tab" type="button" role="tab" aria-selected="true" aria-controls="plan">Mengen planen</button>
+        <button id="tab-check" class="tab" type="button" role="tab" aria-selected="false" aria-controls="check">Mischung prüfen</button>
+      </div>
+      <section id="plan" role="tabpanel" aria-labelledby="tab-plan">
+        <h2>Wie viel Aroma, Nikotin und Basis?</h2>
+        <p class="sub">Gib die gewünschte Gesamtmenge, Nikotinstärke, Stärke des Nikotinshots und den Aromaanteil ein. Beim Aroma kannst du zwischen ml und % wechseln.</p>
+        <div class="inputs">
+          <div><label for="p-volume">Gesamtmenge</label><div class="inputbox"><input id="p-volume" type="text" inputmode="decimal" min="0.1" step="any" value="100"><span class="unit">ml</span></div></div>
+          <div><label for="p-target">Gewünschte Nikotinstärke</label><div class="inputbox"><input id="p-target" type="text" inputmode="decimal" min="0" step="any" value="3"><span class="unit">mg/ml</span></div></div>
+          <div><label for="p-shot">Stärke des Nikotinshots</label><div class="inputbox"><input id="p-shot" type="text" inputmode="decimal" min="0.1" step="any" value="20"><span class="unit">mg/ml</span></div></div>
+          <div><label for="p-flavor">Aromaanteil</label><div class="inputbox"><input id="p-flavor" type="text" inputmode="decimal" min="0" step="any" value="10"><select id="p-flavor-unit" class="unit-select" aria-label="Aroma-Einheit wählen"><option value="ml" selected>ml</option><option value="percent">%</option></select></div></div>
+        </div>
+        <button id="calc-plan" class="calcbtn" type="button">Jetzt berechnen</button>
+        <div class="results" aria-live="polite">
+          <div class="resultgrid">
+            <div class="result primary"><div class="name">Nikotinshot</div><div class="value" id="r-shot">–</div><div class="suffix">ml</div></div>
+            <div class="result"><div class="name">Aroma</div><div class="value" id="r-flavor">–</div><div class="suffix">ml</div></div>
+            <div class="result"><div class="name">Nikotinfreie Basis</div><div class="value" id="r-base">–</div><div class="suffix">ml</div></div>
+          </div>
+          <div id="p-hint" class="hint">Das entspricht 1,5 Nikotinshots à 10 ml.</div>
+        </div>
+      </section>
+      <section id="check" class="hidden" role="tabpanel" aria-labelledby="tab-check">
+        <h2>Wie stark ist deine Mischung?</h2>
+        <p class="sub">Gib die vorhandenen Mengen von Aroma, Nikotinshot und nikotinfreier Basis ein.</p>
+        <div class="inputs">
+          <div><label for="c-flavor">Aroma</label><div class="inputbox"><input id="c-flavor" type="text" inputmode="decimal" min="0" step="any" value="10"><span class="unit">ml</span></div></div>
+          <div><label for="c-shotvolume">Nikotinshot</label><div class="inputbox"><input id="c-shotvolume" type="text" inputmode="decimal" min="0" step="any" value="15"><span class="unit">ml</span></div></div>
+          <div><label for="c-base">Nikotinfreie Basis</label><div class="inputbox"><input id="c-base" type="text" inputmode="decimal" min="0" step="any" value="75"><span class="unit">ml</span></div></div>
+          <div><label for="c-shotstrength">Stärke des Nikotinshots</label><div class="inputbox"><input id="c-shotstrength" type="text" inputmode="decimal" min="0" step="any" value="20"><span class="unit">mg/ml</span></div></div>
+        </div>
+        <button id="calc-check" class="calcbtn" type="button">Nikotinstärke berechnen</button>
+        <div class="results" aria-live="polite">
+          <div class="resultgrid">
+            <div class="result primary"><div class="name">Nikotinstärke</div><div class="value" id="r-strength">–</div><div class="suffix">mg/ml</div></div>
+            <div class="result"><div class="name">Gesamtmenge</div><div class="value" id="r-total">–</div><div class="suffix">ml</div></div>
+            <div class="result"><div class="name">Aromaanteil</div><div class="value" id="r-percentage">–</div><div class="suffix">%</div></div>
+          </div>
+          <div id="c-hint" class="hint">Berechnet unter der Annahme, dass Aroma und Basis nikotinfrei sind.</div>
+        </div>
+      </section>
+    </section>
+    <footer>Hinweis: Der Rechner dient nur zur Mengenberechnung. Die Werte setzen nikotinfreies Aroma und nikotinfreie Basis voraus. Nikotin ist giftig: Hautkontakt vermeiden, sicher lagern und von Kindern und Haustieren fernhalten. Nicht für hochkonzentrierte Nikotinlösungen gedacht.</footer>
+  </main>
+  <script>
+    const $ = id => document.getElementById(id);
+    // Die Vorschau-Warnung ist nur sichtbar, wenn JavaScript nicht ausgeführt wurde.
+    $('js-warning').classList.add('hidden');
+    const num = id => { const raw=$(id).value.trim().replace(/\s/g,''); return raw==='' ? NaN : Number(raw.replace(',','.')); };
+    const fmt = value => new Intl.NumberFormat('de-DE',{maximumFractionDigits:2}).format(Math.abs(value)<0.00000001?0:value);
+    const show = (id,value) => $(id).textContent=Number.isFinite(value)?fmt(value):'–';
+    const setHint=(id,message,isError)=>{const el=$(id);el.textContent=message;el.classList.toggle('error',!!isError);};
+    function calculatePlan(){
+      const volume=num('p-volume'), target=num('p-target'), strength=num('p-shot'), aromaInput=num('p-flavor');
+      const aromaInMl=$('p-flavor-unit').value==='ml';
+      let error='';
+      if(![volume,target,strength,aromaInput].every(Number.isFinite)) error='Bitte alle vier Felder mit gültigen Zahlen ausfüllen.';
+      else if(volume<=0 || strength<=0 || target<0 || aromaInput<0) error='Bitte positive Mengen und eine positive Shot-Stärke eingeben. Nikotin- und Aromaanteile dürfen nicht negativ sein.';
+      else if(!aromaInMl && aromaInput>100) error='Der Aromaanteil darf höchstens 100 % betragen.';
+      const shot=volume*target/strength;
+      const flavor=aromaInMl ? aromaInput : volume*aromaInput/100;
+      const base=volume-shot-flavor;
+      if(!error && flavor>volume) error='Die Aromamenge darf die Gesamtmenge nicht überschreiten.';
+      if(!error && base < -1e-8) error='Diese Mischung ist nicht möglich: Nikotinshot und Aroma überschreiten die Gesamtmenge. Stärke oder Aromaanteil reduzieren.';
+      if(error){['r-shot','r-flavor','r-base'].forEach(id=>$(id).textContent='–');setHint('p-hint',error,true);return;}
+      show('r-shot',shot);show('r-flavor',flavor);show('r-base',Math.max(0,base));
+      setHint('p-hint',`Aroma: ${fmt(flavor)} ml (${fmt(flavor/volume*100)} %). Das entspricht ${fmt(shot/10)} Nikotinshots à 10 ml.`,false);
+    }
+    function calculateCheck(){
+      const flavor=num('c-flavor'),shot=num('c-shotvolume'),base=num('c-base'),strength=num('c-shotstrength');
+      let error='';
+      if(![flavor,shot,base,strength].every(Number.isFinite)) error='Bitte alle vier Felder mit gültigen Zahlen ausfüllen.';
+      else if([flavor,shot,base,strength].some(x=>x<0)) error='Bitte keine negativen Werte eingeben.';
+      const total=flavor+shot+base;
+      if(!error && total<=0) error='Die Gesamtmenge muss größer als 0 ml sein.';
+      if(error){['r-strength','r-total','r-percentage'].forEach(id=>$(id).textContent='–');setHint('c-hint',error,true);return;}
+      show('r-strength',shot*strength/total);show('r-total',total);show('r-percentage',flavor/total*100);
+      setHint('c-hint','Berechnet unter der Annahme, dass Aroma und Basis nikotinfrei sind.',false);
+    }
+    function switchTab(tab){
+      const planning=tab==='plan';
+      $('plan').classList.toggle('hidden',!planning);$('check').classList.toggle('hidden',planning);
+      $('tab-plan').setAttribute('aria-selected',String(planning));$('tab-check').setAttribute('aria-selected',String(!planning));
+    }
+    $('calc-plan').addEventListener('click',calculatePlan);
+    $('calc-check').addEventListener('click',calculateCheck);
+    $('tab-plan').addEventListener('click',()=>switchTab('plan'));
+    $('tab-check').addEventListener('click',()=>switchTab('check'));
+    ['p-volume','p-target','p-shot','p-flavor'].forEach(id=>$(id).addEventListener('input',calculatePlan));
+    let previousFlavorUnit='ml';
+    $('p-flavor-unit').addEventListener('change',()=>{
+      const selectedUnit=$('p-flavor-unit').value;
+      const volume=num('p-volume'), amount=num('p-flavor');
+      // Beim Wechseln bleibt die absolute Aromamenge erhalten.
+      if(Number.isFinite(volume) && volume>0 && Number.isFinite(amount)){
+        const converted=previousFlavorUnit==='ml' ? amount/volume*100 : amount*volume/100;
+        $('p-flavor').value=Number(converted.toFixed(4));
+      }
+      previousFlavorUnit=selectedUnit;
+      calculatePlan();
+    });
+    ['c-flavor','c-shotvolume','c-base','c-shotstrength'].forEach(id=>$(id).addEventListener('input',calculateCheck));
+    calculatePlan();calculateCheck();
+  </script>
+</body>
+</html>
